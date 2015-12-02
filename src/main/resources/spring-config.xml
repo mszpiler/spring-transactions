@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:aop="http://www.springframework.org/schema/aop"
+       xmlns:tx="http://www.springframework.org/schema/tx"
+       xsi:schemaLocation="
+        http://www.springframework.org/schema/beans
+        http://www.springframework.org/schema/beans/spring-beans.xsd
+        http://www.springframework.org/schema/tx
+        http://www.springframework.org/schema/tx/spring-tx.xsd
+        http://www.springframework.org/schema/aop
+        http://www.springframework.org/schema/aop/spring-aop.xsd">
+
+    <!--must be txManager configured-->
+    <bean id="txManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+        <property name="dataSource" ref="dataSource"/>
+    </bean>
+
+    <!-- must be dataSource configured -->
+    <bean id="dataSource" class="org.springframework.jdbc.datasource.DriverManagerDataSource">
+        <property name="driverClassName" value="com.mysql.jdbc.Driver"/>
+        <property name="url" value="jdbc:mysql://localhost:3306/spring_study"/>
+        <property name="username" value="spring_study"/>
+        <property name="password" value="spring_study"/>
+    </bean>
+
+    <!-- annotation @Transaction support for com.enotion.service.annotation package-->
+    <tx:annotation-driven transaction-manager="txManager"/>
+
+    <!-- example of transaction configuration using aspects -->
+    <tx:advice id="txAdvice" transaction-manager="txManager">
+        <!-- the transactional semantics... -->
+        <tx:attributes>
+            <!-- all methods starting with 'get' are read-only -->
+            <tx:method name="get*" read-only="true"/>
+            <!-- other methods use the default transaction settings (see below) -->
+            <tx:method name="*"/>
+
+            <!--example with rollback configuration -->
+            <tx:method name="execWithRollback" rollback-for="UnsupportedOperationException"/>
+            <tx:method name="execWithourRollback" no-rollback-for="UnsupportedOperationException"/>
+        </tx:attributes>
+    </tx:advice>
+
+    <!-- example of apsect configuration for transaction support -->
+    <aop:config>
+        <!-- point where transactions are touched -->
+        <aop:pointcut id="aspectExampleServiceOperation"
+                      expression="execution(* com.enotion.service.aspect.AspectExampleService.*(..))"/>
+        <aop:advisor advice-ref="txAdvice" pointcut-ref="aspectExampleServiceOperation"/>
+    </aop:config>
+
+    <bean id="customerDao" class="com.enotion.service.annotation.CustomerDAOImpl">
+        <property name="dataSource" ref="dataSource"/>
+    </bean>
+
+    <bean id="roleDao" class="com.enotion.service.annotation.RoleDAOImpl">
+        <property name="dataSource" ref="dataSource"/>
+    </bean>
+
+    <bean id="roleService" class="com.enotion.service.annotation.RoleServiceImpl">
+        <property name="roleDAO" ref="roleDao"/>
+    </bean>
+
+    <bean id="customerService" class="com.enotion.service.annotation.CustomerServiceImpl">
+        <property name="customerDAO" ref="customerDao"/>
+        <property name="roleService" ref="roleService"/>
+    </bean>
+
+</beans>
