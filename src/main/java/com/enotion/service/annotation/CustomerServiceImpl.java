@@ -88,7 +88,8 @@ public class CustomerServiceImpl implements CustomerService {
     }
 
     /**
-     * Interesting example shows that there is no transaction inside createSomeCustomerForProxyBasedTest even if method createCustomerComplexProxyBasedExample is transactional !!!
+     * Interesting example shows that there is no transaction inside createSomeCustomerForProxyBasedTest even
+     * if method createCustomerComplexProxyBasedExample is transactional !!!
      * Beacause of proxy based way in Spring AOP
      * @param customerOne
      * @param customerTwo
@@ -99,6 +100,17 @@ public class CustomerServiceImpl implements CustomerService {
         this.createSomeCustomerForProxyBasedTest(customerTwo);
     }
 
+
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
+    public void createCustomerComplexProxyBasedExampleAllTransactional(Customer customerOne, Customer customerTwo) {
+        this.customerDAO.insertCustomer(customerOne);
+        this.createSomeCustomerForProxyBasedTestTransactional(customerTwo);
+    }
+
+    @Transactional
+    public void createSomeCustomerForProxyBasedTestTransactional(Customer customer) {
+        this.customerDAO.insertCustomer(customer);
+    }
     public void createSomeCustomerForProxyBasedTest(Customer customer) {
         this.customerDAO.insertCustomer(customer);
     }

@@ -307,11 +307,35 @@ public class CustomerServiceImplTest {
             assertEquals(new Integer(1), addressVol);
 
             /**
-             * This assertion shows that in second customer creation there is no transactional because person was created - only addres was rolledback
+             * This assertion shows that in second customer creation there is no transactional
+             * because person was created - only addres was rolledback
              */
+        }
+    }
+
+    /**
+     * Please compare it with test shouldNotCreateAddressInSecondCustomer().
+     * Here you can see that inside body executed method are transactional. Creation second customer is transactional, so when rollback is executed in second step
+     * then whole actions inside createCustomerComplexProxyBasedExampleAllTransactional() are rolledback
+     */
+    @Test
+    @Transactional
+    public void shouldNotCreateAnyItemsDuringExecution() {
+        customerService.cleanDatabase();
+        roleService.cleanDatabase();
+        try {
+            //first customer is ok, second has wrong data (too long city), rollback is executed in second step
+            //here whole method is rolledback
+            customerService.createCustomerComplexProxyBasedExampleAllTransactional(okCustomer, customerWithTooLongCity);
+        } catch (Exception e) {
+
+            Integer addressVol = customerDAO.getAddressVol();
+            Integer personVol = customerDAO.getPersonVol();
+
+            assertEquals(new Integer(0), personVol);
+            assertEquals(new Integer(0), addressVol);
 
         }
-
     }
 
 }

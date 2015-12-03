@@ -25,7 +25,9 @@ public interface CustomerService {
     void createCustomerComplexNewRequired_WithTransOutside(Customer customer, Role roleOne, Role roleTwo);
 
     void createCustomerComplexProxyBasedExample(Customer customerOne, Customer customerTwo);
+    void createCustomerComplexProxyBasedExampleAllTransactional(Customer customerOne, Customer customerTwo);
     void createSomeCustomerForProxyBasedTest(Customer customer);
+    void createSomeCustomerForProxyBasedTestTransactional(Customer customer);
 
     void cleanDatabase();
 
