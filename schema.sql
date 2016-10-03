@@ -17,3 +17,5 @@ CREATE TABLE IF NOT EXISTS `address` (
   `street` varchar(15) NOT NULL,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB  DEFAULT CHARSET=latin1 AUTO_INCREMENT=1 ;
+
+//test
